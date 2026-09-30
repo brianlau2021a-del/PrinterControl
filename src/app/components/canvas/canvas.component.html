@@ -1,0 +1,30 @@
+<div class="panel h-full flex flex-col relative overflow-hidden"
+     (wheel)="onWheel($event)">
+  <div class="panel-section flex items-center justify-between">
+    <div class="section-title mb-0">Design Canvas</div>
+    <div class="flex items-center gap-1">
+      <button class="btn-icon text-xs px-2 py-0.5" (click)="setZoom(25)">25%</button>
+      <button class="btn-icon text-xs px-2 py-0.5" (click)="setZoom(50)">50%</button>
+      <button class="btn-icon text-xs px-2 py-0.5" (click)="setZoom(100)">100%</button>
+      <button class="btn-icon text-xs px-2 py-0.5" (click)="setZoom(150)">150%</button>
+      <button class="btn-icon text-xs px-2 py-0.5" (click)="setZoom(200)">200%</button>
+      <span class="text-xs text-slate-500 ml-2">{{ zoom }}%</span>
+    </div>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center bg-slate-950/30 overflow-auto">
+    <canvas #canvasEl
+            class="cursor-crosshair shadow-2xl shadow-black/40 rounded-lg"
+            (mousedown)="onMouseDown($event)"
+            (mousemove)="onMouseMove($event)"
+            (mouseup)="onMouseUp()"
+            (mouseleave)="onMouseUp()">
+    </canvas>
+  </div>
+
+  <div class="panel-section py-1">
+    <div class="text-xs text-slate-500 text-center">
+      Label: {{ labelWidth }} x {{ labelHeight }} mm | Scroll to zoom
+    </div>
+  </div>
+</div>
