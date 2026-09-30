@@ -129,7 +129,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
         this.elements,
         this.labelWidth,
         this.labelHeight,
-        2
+        0.5
       );
 
       this.currentSnapLines = snapResult.lines;
