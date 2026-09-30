@@ -13,6 +13,14 @@
       </span>
     </div>
     <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 mr-1 pr-3 border-r border-slate-700/50">
+        <label class="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Copies</label>
+        <input type="number"
+               class="input-field text-xs py-1 px-2 w-14 text-center bg-slate-800/80 border-slate-600/50"
+               [(ngModel)]="settings.copies"
+               [disabled]="!printerAvailable"
+               min="1" max="99">
+      </div>
       <button class="btn-primary text-xs px-3 py-1" (click)="print()" [disabled]="!printerAvailable">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
         Print
@@ -57,6 +65,7 @@
               <option *ngFor="let o of orientationOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
+
         </div>
       </div>
 
@@ -69,6 +78,7 @@
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="getPrinterName()" [disabled]="!printerAvailable">Name</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="getPrinterDPI()" [disabled]="!printerAvailable">DPI</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="showProperty()" [disabled]="!printerAvailable">Props</button>
+
         </div>
         <div class="grid grid-cols-2 gap-1.5">
           <div>
@@ -83,6 +93,13 @@
               <option *ngFor="let o of dpiOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
+        </div>
+        <div class="mt-2">
+          <label class="label-text text-[10px]">Job Name</label>
+          <input type="text" class="input-field text-xs mt-0.5 py-0.5"
+                 [(ngModel)]="settings.jobName"
+                 [disabled]="!printerAvailable"
+                 placeholder="例如: 出貨單-01">
         </div>
       </div>
 

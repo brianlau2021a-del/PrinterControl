@@ -18,6 +18,9 @@ export class DesignService {
   selectedId$ = this._selectedId$.asObservable();
   zoom$ = this._zoom$.asObservable();
 
+  private past: string[] = [];
+  private future: string[] = [];
+
   get labelWidth(): number { return this._labelWidth$.value; }
   get labelHeight(): number { return this._labelHeight$.value; }
   get orientation(): number { return this._orientation$.value; }
@@ -49,8 +52,11 @@ export class DesignService {
   }
 
   addElement(type: ElementType): void {
+    this.saveHistory();
+
     const defaults = ELEMENT_DEFAULTS[type] || {};
     const id = `el_${this.nextId++}`;
+
     const el: LabelElement = {
       id,
       type,
@@ -62,8 +68,17 @@ export class DesignService {
       name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${this.nextId - 1}`,
       ...defaults,
     };
+
     this._elements$.next([...this.elements, el]);
     this._selectedId$.next(id);
+  }
+
+  deleteElement(id: string): void {
+    this.saveHistory(); // 加入這行
+    this._elements$.next(this.elements.filter(e => e.id !== id));
+    if (this.selectedId === id) {
+      this._selectedId$.next(null);
+    }
   }
 
   updateElement(id: string, changes: Partial<LabelElement>): void {
@@ -71,20 +86,39 @@ export class DesignService {
     this._elements$.next(updated);
   }
 
+  saveHistory(): void {
+    const currentState = JSON.stringify(this.elements);
+    // 避免連續儲存完全一樣的狀態
+    if (this.past.length === 0 || this.past[this.past.length - 1] !== currentState) {
+      this.past.push(currentState);
+      this.future = []; // 有新動作就清空重做堆疊
+    }
+  }
+
   selectElement(id: string | null): void {
     this._selectedId$.next(id);
   }
 
-  deleteElement(id: string): void {
-    this._elements$.next(this.elements.filter(e => e.id !== id));
-    if (this.selectedId === id) {
-      this._selectedId$.next(null);
-    }
-  }
 
   deleteSelected(): void {
     if (this.selectedId) {
       this.deleteElement(this.selectedId);
+    }
+  }
+
+  undo(): void {
+    if (this.past.length > 0) {
+      this.future.push(JSON.stringify(this.elements));
+      const previous = JSON.parse(this.past.pop()!);
+      this._elements$.next(previous);
+    }
+  }
+
+  redo(): void {
+    if (this.future.length > 0) {
+      this.past.push(JSON.stringify(this.elements));
+      const next = JSON.parse(this.future.pop()!);
+      this._elements$.next(next);
     }
   }
 
@@ -97,6 +131,7 @@ export class DesignService {
   }
 
   moveLayerUp(id: string): void {
+    this.saveHistory();
     const els = [...this.elements];
     const idx = els.findIndex(e => e.id === id);
     if (idx < els.length - 1) {
@@ -106,6 +141,7 @@ export class DesignService {
   }
 
   moveLayerDown(id: string): void {
+    this.saveHistory();
     const els = [...this.elements];
     const idx = els.findIndex(e => e.id === id);
     if (idx > 0) {
@@ -115,6 +151,7 @@ export class DesignService {
   }
 
   clearAll(): void {
+    this.saveHistory();
     this._elements$.next([]);
     this._selectedId$.next(null);
   }

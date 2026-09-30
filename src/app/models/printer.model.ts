@@ -15,6 +15,8 @@ export interface PrintSettings {
   printMode: number;
   printerDpi: number;
   printerWidth: number;
+  copies: number;
+  jobName?: string;
 }
 
 export const GAP_TYPE_OPTIONS = [

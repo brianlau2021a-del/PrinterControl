@@ -16,6 +16,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
   zoom = 100;
   elements: LabelElement[] = [];
   selectedId: string | null = null;
+  private renderPending = false;
 
   private ctx!: CanvasRenderingContext2D;
   private subs: Subscription[] = [];
@@ -55,17 +56,21 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private render(): void {
-    if (!this.ctx) return;
-    this.renderer.render(
-      this.ctx,
-      this.canvasRef.nativeElement,
-      this.labelWidth,
-      this.labelHeight,
-      this.zoom,
-      this.elements,
-      this.selectedId,
-      this.currentSnapLines
-    );
+    if (!this.ctx || this.renderPending) return;
+    this.renderPending = true;
+    requestAnimationFrame(() => {
+      this.renderer.render(
+        this.ctx,
+        this.canvasRef.nativeElement,
+        this.labelWidth,
+        this.labelHeight,
+        this.zoom,
+        this.elements,
+        this.selectedId,
+        this.currentSnapLines
+      );
+      this.renderPending = false;
+    });
   }
 
   onMouseDown(event: MouseEvent): void {
@@ -80,6 +85,7 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
       if (sel) {
         const handleIdx = this.renderer.hitTestHandle(mx, my, sel, scale, pad);
         if (handleIdx >= 0) {
+          this.design.saveHistory();
           this.isResizing = true;
           this.resizeHandle = handleIdx;
           this.dragStartX = mx;
@@ -95,7 +101,10 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const hit = this.renderer.hitTestElement(mx, my, this.elements, scale, pad);
     if (hit) {
-      this.design.selectElement(hit.id);
+      if (this.selectedId !== hit.id) {
+        this.design.selectElement(hit.id);
+      }
+      this.design.saveHistory();
       this.isDragging = true;
       this.dragStartX = mx;
       this.dragStartY = my;

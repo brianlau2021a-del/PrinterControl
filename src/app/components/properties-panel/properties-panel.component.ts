@@ -31,6 +31,7 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy {
 
   updateProp(key: string, value: any): void {
     if (!this.selectedElement) return;
+    this.design.saveHistory();
     this.design.updateElement(this.selectedElement.id, { [key]: value });
   }
 

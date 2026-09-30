@@ -38,6 +38,8 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
     printMode: 1,
     printerDpi: 203,
     printerWidth: 384,
+    copies: 1,
+    jobName: 'Label Designer'
   };
 
   gapTypeOptions = GAP_TYPE_OPTIONS;
@@ -125,6 +127,8 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
       this.settings.printSpeed,
       this.settings.printDarkness,
       0,
+      this.settings.copies,
+      this.settings.jobName
     );
   }
 
@@ -146,6 +150,8 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
       this.settings.printSpeed,
       this.settings.printDarkness,
       this.settings.printMode,
+      this.settings.copies,
+      this.settings.jobName
     );
   }
 

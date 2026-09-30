@@ -88,4 +88,12 @@ export class ToolbarComponent implements OnInit, OnDestroy {
       this.design.clearAll();
     }
   }
+
+  undo(): void {
+    this.design.undo();
+  }
+
+  redo(): void {
+    this.design.redo();
+  }
 }

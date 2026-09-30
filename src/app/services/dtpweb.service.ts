@@ -143,6 +143,8 @@ export class DtpwebService {
     printSpeed: number,
     printDarkness: number,
     printMode: number,
+    copies: number = 1,
+    jobName: string = 'Label Designer',
     callback?: (result: any) => void
   ): void {
     if (!this.api) {
@@ -182,11 +184,11 @@ export class DtpwebService {
         }
         this.addLog('Printer opened successfully');
         this._printerOpened$.next(true);
-        this.executePrintJob(labelWidth, labelHeight, orientation, elements, gapType, printSpeed, printDarkness, printMode, action, callback);
+        this.executePrintJob(labelWidth, labelHeight, orientation, elements, gapType, printSpeed, printDarkness, printMode, action, copies, jobName, callback);
       });
     } else {
       this.addLog('Job started successfully');
-      this.executePrintJob(labelWidth, labelHeight, orientation, elements, gapType, printSpeed, printDarkness, printMode, action, callback);
+      this.executePrintJob(labelWidth, labelHeight, orientation, elements, gapType, printSpeed, printDarkness, printMode, action, copies, jobName, callback);
     }
   }
 
@@ -200,6 +202,8 @@ export class DtpwebService {
     printDarkness: number,
     printMode: number,
     action: number,
+    copies: number,
+    jobName: string,
     callback?: (result: any) => void
   ): void {
     if (!this.api) return;
@@ -213,6 +217,7 @@ export class DtpwebService {
       gapType,
       printDarkness,
       printSpeed,
+      copies
     });
 
     if (!startResult) {
@@ -235,7 +240,9 @@ export class DtpwebService {
 
     this.api.commitJob((res: any) => {
       this.addLog('Job committed');
+      console.log('Job committed', res)
       if (res) {
+
         if (res.previewData) {
           this._previewImages$.next(res.previewData);
           this.addLog(`Preview: ${res.previewData.length} page(s)`);
