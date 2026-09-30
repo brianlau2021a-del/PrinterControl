@@ -133,10 +133,31 @@
       <div *ngIf="isImage" class="space-y-2 border-t border-slate-700/50 pt-3">
         <div class="section-title">Image Settings</div>
         <div>
-          <label class="label-text">Image URL / Path</label>
-          <input class="input-field mt-1" [value]="selectedElement.imageFile || ''"
-                 (change)="updateProp('imageFile', $any($event.target).value)"
-                 placeholder="https://... or base64">
+          <label class="label-text">Image Source</label>
+          <div class="flex items-center gap-2 mt-1">
+            <!-- 原本的輸入框保留，讓使用者依然可以貼 URL，並加上 flex-1 讓它填滿剩餘空間 -->
+            <input class="input-field flex-1" [value]="selectedElement.imageFile || ''"
+                   (change)="updateProp('imageFile', $any($event.target).value)"
+                   placeholder="URL or Upload ->">
+
+            <!-- 隱藏的 File Input -->
+            <input type="file" #fileUpload class="hidden" accept="image/png, image/jpeg, image/jpg, image/bmp"
+                   (change)="onImageUpload($event)">
+
+            <!-- 觸發上傳的按鈕 -->
+            <button class="btn-secondary px-3 py-1.5" (click)="fileUpload.click()" title="Upload Local Image">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- (選配) 進階：因為是圖片，順便加上閾值(Threshold)的調整 -->
+        <div class="mt-2">
+          <label class="label-text">B&W Threshold (0-255)</label>
+          <input type="number" class="input-field mt-1" [value]="selectedElement.threshold || 192"
+                 (change)="updateNumberProp('threshold', $event)" min="0" max="255">
         </div>
       </div>
 

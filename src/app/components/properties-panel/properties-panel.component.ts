@@ -47,6 +47,62 @@ export class PropertiesPanelComponent implements OnInit, OnDestroy {
     this.updateProp('fill', checked);
   }
 
+  onImageUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      const tempUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = () => {
+        if (this.selectedElement) {
+          const aspectRatio = img.height / img.width;
+
+          const MAX_SIZE = 800;
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+
+          if (targetWidth > MAX_SIZE || targetHeight > MAX_SIZE) {
+            if (targetWidth > targetHeight) {
+              targetHeight = Math.round((MAX_SIZE / targetWidth) * targetHeight);
+              targetWidth = MAX_SIZE;
+            } else {
+              targetWidth = Math.round((MAX_SIZE / targetHeight) * targetWidth);
+              targetHeight = MAX_SIZE;
+            }
+          }
+
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = targetWidth;
+          tempCanvas.height = targetHeight;
+          const ctx = tempCanvas.getContext('2d')!;
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, targetWidth, targetHeight);
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+          const compressedBase64 = tempCanvas.toDataURL('image/jpeg', 0.8);
+
+          const currentWidth = this.selectedElement.width;
+          let newHeight = currentWidth * aspectRatio;
+          newHeight = Math.round(newHeight * 2) / 2;
+
+          this.design.saveHistory();
+          this.design.updateElement(this.selectedElement.id, {
+            imageFile: compressedBase64,
+            height: newHeight
+          });
+        }
+
+        URL.revokeObjectURL(tempUrl);
+      };
+
+      img.src = tempUrl;
+      input.value = '';
+    }
+  }
+
   deleteSelected(): void {
     this.design.deleteSelected();
   }

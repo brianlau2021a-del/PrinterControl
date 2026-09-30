@@ -14,6 +14,7 @@ export class CanvasRendererService {
   private readonly GRID_SIZE = 5;
   private readonly HANDLE_SIZE = 6;
   private readonly PX_PER_MM = 12;
+  private imageCache = new Map<string, HTMLImageElement>();
 
   render(
     ctx: CanvasRenderingContext2D,
@@ -23,7 +24,8 @@ export class CanvasRendererService {
     zoom: number,
     elements: LabelElement[],
     selectedId: string | null,
-    snapLines?: SnapLine[]
+    snapLines?: SnapLine[],
+    onImageLoad?: () => void
   ): void {
     const scale = (zoom / 100) * this.PX_PER_MM;
     const lw = labelWidth * scale;
@@ -56,7 +58,7 @@ export class CanvasRendererService {
     ctx.clip();
 
     for (const el of elements) {
-      this.drawElement(ctx, el, scale, false);
+      this.drawElement(ctx, el, scale, false, onImageLoad);
     }
     ctx.restore();
 
@@ -90,7 +92,7 @@ export class CanvasRendererService {
     }
   }
 
-  private drawElement(ctx: CanvasRenderingContext2D, el: LabelElement, scale: number, _isPreview: boolean): void {
+  private drawElement(ctx: CanvasRenderingContext2D, el: LabelElement, scale: number, _isPreview: boolean, onImageLoad?: () => void): void {
     const x = el.x * scale;
     const y = el.y * scale;
     const w = el.width * scale;
@@ -115,7 +117,7 @@ export class CanvasRendererService {
         this.drawBarcode(ctx, el, x, y, w, h);
         break;
       case 'image':
-        this.drawImage(ctx, el, x, y, w, h);
+        this.drawImage(ctx, el, x, y, w, h, onImageLoad);
         break;
       case 'rectangle':
         this.drawRect(ctx, el, x, y, w, h);
@@ -165,15 +167,15 @@ export class CanvasRendererService {
 
   private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, autoReturn: number): string[] {
     if (maxWidth <= 0 || autoReturn === 0) return [text];
-    
+
     const lines: string[] = [];
     const chars = text.split('');
     let line = '';
-    
+
     for (const ch of chars) {
       const test = line + ch;
       const testWidth = ctx.measureText(test).width;
-      
+
       if (testWidth > maxWidth && line) {
         lines.push(line);
         line = ch;
@@ -257,21 +259,40 @@ export class CanvasRendererService {
     ctx.textBaseline = 'alphabetic';
   }
 
-  private drawImage(ctx: CanvasRenderingContext2D, el: LabelElement, x: number, y: number, w: number, h: number): void {
+  private drawImage(ctx: CanvasRenderingContext2D, el: LabelElement, x: number, y: number, w: number, h: number, onImageLoad?: () => void): void {
+    if (el.imageFile) {
+      // 如果圖片已經載入過，直接畫出來
+      if (this.imageCache.has(el.imageFile)) {
+        const img = this.imageCache.get(el.imageFile)!;
+        ctx.drawImage(img, x, y, w, h);
+      } else {
+        // 如果還沒載入，先畫 Placeholder，並開始非同步載入圖片
+        const img = new Image();
+        img.onload = () => {
+          this.imageCache.set(el.imageFile!, img);
+          if (onImageLoad) onImageLoad(); // 圖片載入完成！通知 Canvas 重新渲染
+        };
+        img.src = el.imageFile;
+        this.drawPlaceholder(ctx, 'Loading...', x, y, w, h);
+      }
+    } else {
+      this.drawPlaceholder(ctx, 'No Image', x, y, w, h);
+    }
+  }
+
+  private drawPlaceholder(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, w: number, h: number): void {
     ctx.strokeStyle = '#94a3b8';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.strokeRect(x, y, w, h);
     ctx.setLineDash([]);
-
     ctx.fillStyle = '#f1f5f9';
     ctx.fillRect(x, y, w, h);
-
     ctx.fillStyle = '#94a3b8';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(el.imageFile ? 'Image' : 'No Image', x + w / 2, y + h / 2);
+    ctx.fillText(text, x + w / 2, y + h / 2);
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
   }

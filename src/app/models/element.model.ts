@@ -43,6 +43,7 @@ export interface LabelDesign {
   labelHeight: number;
   orientation: number;
   elements: LabelElement[];
+  printSettings?: any;
 }
 
 export const ELEMENT_DEFAULTS: Record<ElementType, Partial<LabelElement>> = {

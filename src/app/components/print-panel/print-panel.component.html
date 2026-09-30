@@ -35,33 +35,46 @@
   <div class="border-t border-slate-700/30 flex-1 flex flex-col overflow-hidden">
     <div class="grid grid-cols-4 gap-0 divide-x divide-slate-700/30 flex-1">
       <div class="p-3 space-y-2">
-        <div class="section-title">Printer</div>
-        <select class="select-field text-xs" [value]="selectedPrinter" (change)="onPrinterChange($any($event.target).value)"
+        <!-- 標題與設定按鈕水平排列 -->
+        <div class="flex items-center justify-between mb-1">
+          <div class="section-title mb-0">Printer</div>
+          <button class="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  (click)="showProperty()"
+                  [disabled]="!printerAvailable"
+                  title="開啟印表機系統設定">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            設定
+          </button>
+        </div>
+        <select class="select-field text-xs" [value]="selectedPrinter" ...>
                 [disabled]="!printerAvailable">
           <option *ngFor="let p of printers" [value]="getPrinterDisplayName(p)">{{ getPrinterDisplayName(p) }}</option>
         </select>
         <div class="grid grid-cols-2 gap-1.5">
           <div>
             <label class="label-text text-[10px]">Paper</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.gapType" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.gapType" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of gapTypeOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
           <div>
             <label class="label-text text-[10px]">Speed</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printSpeed" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printSpeed" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of printSpeedOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
           <div>
             <label class="label-text text-[10px]">Darkness</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printDarkness" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printDarkness" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of printDarknessOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
           <div>
             <label class="label-text text-[10px]">Rotate</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.orientation" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.orientation" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of orientationOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
@@ -71,25 +84,24 @@
 
       <div class="p-3 space-y-2">
         <div class="section-title">Operations</div>
-        <div class="flex flex-wrap gap-1">
+        <!--<div class="flex flex-wrap gap-1">
           <button class="btn-success text-[10px] px-2 py-0.5" (click)="openPrinter()" [disabled]="!printerAvailable">Open</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="closePrinter()" [disabled]="!printerAvailable">Close</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="isPrinterOpened()" [disabled]="!printerAvailable">Status</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="getPrinterName()" [disabled]="!printerAvailable">Name</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="getPrinterDPI()" [disabled]="!printerAvailable">DPI</button>
           <button class="btn-secondary text-[10px] px-2 py-0.5" (click)="showProperty()" [disabled]="!printerAvailable">Props</button>
-
-        </div>
+        </div>-->
         <div class="grid grid-cols-2 gap-1.5">
           <div>
             <label class="label-text text-[10px]">Mode</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printMode" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printMode" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of printModeOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
           <div>
             <label class="label-text text-[10px]">DPI</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printerDpi" [disabled]="!printerAvailable">
+            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.printerDpi" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
               <option *ngFor="let o of dpiOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>

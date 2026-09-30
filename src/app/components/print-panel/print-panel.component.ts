@@ -67,7 +67,18 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
       this.design.labelHeight$.subscribe(v => this.labelHeight = v),
       this.design.orientation$.subscribe(v => this.orientation = v),
       this.design.elements$.subscribe(e => this.elements = e),
+
+      this.design.printSettings$.subscribe(s => {
+        if (Object.keys(s).length > 0) {
+          this.settings = { ...this.settings, ...s };
+        }
+      })
     );
+  }
+
+  saveSettingsToDesign(): void {
+    const { copies, jobName, ...coreSettings } = this.settings;
+    this.design.setPrintSettings(coreSettings);
   }
 
   ngOnDestroy(): void {

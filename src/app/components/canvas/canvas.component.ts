@@ -67,7 +67,8 @@ export class CanvasComponent implements OnInit, OnDestroy, AfterViewInit {
         this.zoom,
         this.elements,
         this.selectedId,
-        this.currentSnapLines
+        this.currentSnapLines,
+        () => this.render()
       );
       this.renderPending = false;
     });

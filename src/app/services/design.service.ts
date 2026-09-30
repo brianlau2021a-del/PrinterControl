@@ -28,6 +28,14 @@ export class DesignService {
   get selectedId(): string | null { return this._selectedId$.value; }
   get zoom(): number { return this._zoom$.value; }
 
+  private _printSettings$ = new BehaviorSubject<any>({});
+  printSettings$ = this._printSettings$.asObservable()
+
+  get printSettings(): any { return this._printSettings$.value; }
+  setPrintSettings(settings: any): void {
+    this._printSettings$.next({ ...this.printSettings, ...settings });
+  }
+
   get selectedElement(): LabelElement | null {
     if (!this.selectedId) return null;
     return this.elements.find(e => e.id === this.selectedId) || null;
@@ -163,6 +171,7 @@ export class DesignService {
       labelHeight: this.labelHeight,
       orientation: this.orientation,
       elements: this.elements,
+      printSettings: this.printSettings
     };
     return JSON.stringify(design, null, 2);
   }
@@ -173,6 +182,11 @@ export class DesignService {
       if (design.labelWidth) this._labelWidth$.next(design.labelWidth);
       if (design.labelHeight) this._labelHeight$.next(design.labelHeight);
       if (design.orientation !== undefined) this._orientation$.next(design.orientation);
+
+      if (design.printSettings) {
+        this.setPrintSettings(design.printSettings);
+      }
+
       if (design.elements) {
         this._elements$.next(design.elements);
         this.nextId = design.elements.reduce((max, e) => {
@@ -181,6 +195,8 @@ export class DesignService {
         }, this.nextId);
       }
       this._selectedId$.next(null);
+      this.past = [];
+      this.future = [];
     } catch (e) {
       console.error('Failed to import JSON:', e);
       alert('Failed to import design. Invalid JSON format.');
