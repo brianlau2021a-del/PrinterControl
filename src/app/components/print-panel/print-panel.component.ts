@@ -8,7 +8,6 @@ import {
   GAP_TYPE_OPTIONS,
   PRINT_SPEED_OPTIONS,
   PRINT_DARKNESS_OPTIONS,
-  ORIENTATION_OPTIONS,
   PRINT_MODE_OPTIONS,
   DPI_OPTIONS,
 } from '../../models/printer.model';
@@ -27,14 +26,12 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
 
   labelWidth = 40;
   labelHeight = 30;
-  orientation = 0;
   elements: any[] = [];
 
   settings: PrintSettings = {
     gapType: 255,
     printSpeed: 255,
     printDarkness: 255,
-    orientation: 0,
     printMode: 1,
     printerDpi: 203,
     printerWidth: 384,
@@ -45,7 +42,6 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
   gapTypeOptions = GAP_TYPE_OPTIONS;
   printSpeedOptions = PRINT_SPEED_OPTIONS;
   printDarknessOptions = PRINT_DARKNESS_OPTIONS;
-  orientationOptions = ORIENTATION_OPTIONS;
   printModeOptions = PRINT_MODE_OPTIONS;
   dpiOptions = DPI_OPTIONS;
 
@@ -65,7 +61,6 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
       this.dtpweb.previewImages$.subscribe(i => this.previewImages = i),
       this.design.labelWidth$.subscribe(v => this.labelWidth = v),
       this.design.labelHeight$.subscribe(v => this.labelHeight = v),
-      this.design.orientation$.subscribe(v => this.orientation = v),
       this.design.elements$.subscribe(e => this.elements = e),
 
       this.design.printSettings$.subscribe(s => {
@@ -132,7 +127,7 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
     this.dtpweb.printLabel(
       this.labelWidth,
       this.labelHeight,
-      this.orientation,
+      0,
       this.elements,
       this.settings.gapType,
       this.settings.printSpeed,
@@ -155,7 +150,7 @@ export class PrintPanelComponent implements OnInit, OnDestroy {
     this.dtpweb.printLabel(
       this.labelWidth,
       this.labelHeight,
-      this.orientation,
+      0,
       this.elements,
       this.settings.gapType,
       this.settings.printSpeed,

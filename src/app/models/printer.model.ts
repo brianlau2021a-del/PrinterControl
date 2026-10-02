@@ -11,7 +11,6 @@ export interface PrintSettings {
   gapType: number;
   printSpeed: number;
   printDarkness: number;
-  orientation: number;
   printMode: number;
   printerDpi: number;
   printerWidth: number;
@@ -47,13 +46,6 @@ export const PRINT_DARKNESS_OPTIONS = [
   { value: 12, label: '13' },
   { value: 13, label: '14' },
   { value: 14, label: '15(特浓)' },
-];
-
-export const ORIENTATION_OPTIONS = [
-  { value: 0, label: '横向打印' },
-  { value: 90, label: '右转90度' },
-  { value: 180, label: '旋转180度' },
-  { value: 270, label: '左转90度' },
 ];
 
 export const PRINT_MODE_OPTIONS = [

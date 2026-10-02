@@ -166,7 +166,7 @@ export class DtpwebService {
     const startResult = this.api.startJob({
       width: labelWidth,
       height: labelHeight,
-      orientation,
+      orientation: orientation || 0,
       jobName: 'Label Designer',
       action,
       gapType,
@@ -208,16 +208,15 @@ export class DtpwebService {
   ): void {
     if (!this.api) return;
 
-    const startResult = this.api.startJob({
+   const startResult = this.api.startJob({
       width: labelWidth,
       height: labelHeight,
-      orientation,
-      jobName: 'Label Designer',
+      orientation: orientation || 0,
+      jobName: jobName || 'Label Designer',
       action,
       gapType,
       printDarkness,
       printSpeed,
-      copies
     });
 
     if (!startResult) {

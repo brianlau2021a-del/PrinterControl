@@ -15,12 +15,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  orientationOptions = [
-    { value: 0, label: '0°' },
-    { value: 90, label: '90°' },
-    { value: 180, label: '180°' },
-    { value: 270, label: '270°' },
-  ];
 
   constructor(
     private design: DesignService,
@@ -31,7 +25,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.design.labelWidth$.subscribe(v => this.labelWidth = v),
       this.design.labelHeight$.subscribe(v => this.labelHeight = v),
-      this.design.orientation$.subscribe(v => this.orientation = v),
       this.dtpweb.printerAvailable$.subscribe(v => this.printerAvailable = v),
     );
   }
@@ -47,13 +40,16 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   onHeightChange(val: number): void {
     this.design.setLabelHeight(Math.max(5, val));
   }
-
-  onOrientationChange(val: number): void {
-    this.design.setOrientation(val);
-  }
-
   addElement(type: string): void {
     this.design.addElement(type as any);
+  }
+
+  rotateLeft(): void {
+    this.design.rotateDesign('left');
+  }
+
+  rotateRight(): void {
+    this.design.rotateDesign('right');
   }
 
   saveDesign(): void {

@@ -6,14 +6,12 @@ import { LabelElement, LabelDesign, ElementType, ELEMENT_DEFAULTS } from '../mod
 export class DesignService {
   private _labelWidth$ = new BehaviorSubject<number>(40);
   private _labelHeight$ = new BehaviorSubject<number>(30);
-  private _orientation$ = new BehaviorSubject<number>(0);
   private _elements$ = new BehaviorSubject<LabelElement[]>([]);
   private _selectedId$ = new BehaviorSubject<string | null>(null);
   private _zoom$ = new BehaviorSubject<number>(200);
 
   labelWidth$ = this._labelWidth$.asObservable();
   labelHeight$ = this._labelHeight$.asObservable();
-  orientation$ = this._orientation$.asObservable();
   elements$ = this._elements$.asObservable();
   selectedId$ = this._selectedId$.asObservable();
   zoom$ = this._zoom$.asObservable();
@@ -23,7 +21,6 @@ export class DesignService {
 
   get labelWidth(): number { return this._labelWidth$.value; }
   get labelHeight(): number { return this._labelHeight$.value; }
-  get orientation(): number { return this._orientation$.value; }
   get elements(): LabelElement[] { return this._elements$.value; }
   get selectedId(): string | null { return this._selectedId$.value; }
   get zoom(): number { return this._zoom$.value; }
@@ -49,10 +46,6 @@ export class DesignService {
 
   setLabelHeight(h: number): void {
     this._labelHeight$.next(h);
-  }
-
-  setOrientation(o: number): void {
-    this._orientation$.next(o);
   }
 
   setZoom(z: number): void {
@@ -169,7 +162,7 @@ export class DesignService {
       version: '1.0',
       labelWidth: this.labelWidth,
       labelHeight: this.labelHeight,
-      orientation: this.orientation,
+      orientation: 0,
       elements: this.elements,
       printSettings: this.printSettings
     };
@@ -181,7 +174,6 @@ export class DesignService {
       const design: LabelDesign = JSON.parse(json);
       if (design.labelWidth) this._labelWidth$.next(design.labelWidth);
       if (design.labelHeight) this._labelHeight$.next(design.labelHeight);
-      if (design.orientation !== undefined) this._orientation$.next(design.orientation);
 
       if (design.printSettings) {
         this.setPrintSettings(design.printSettings);
@@ -201,5 +193,67 @@ export class DesignService {
       console.error('Failed to import JSON:', e);
       alert('Failed to import design. Invalid JSON format.');
     }
+  }
+
+  rotateDesign(direction: 'left' | 'right'): void {
+    this.saveHistory();
+    const oldW = this.labelWidth;
+    const oldH = this.labelHeight;
+
+    // 1. 對調畫布長寬
+    this._labelWidth$.next(oldH);
+    this._labelHeight$.next(oldW);
+
+    const updated = this.elements.map(el => {
+      const cx = el.x + el.width / 2;
+      const cy = el.y + el.height / 2;
+
+      let newCx: number, newCy: number;
+      let angleDelta = direction === 'right' ? 90 : 270;
+
+      if (direction === 'right') {
+        newCx = oldH - cy;
+        newCy = cx;
+      } else { // left
+        newCx = cy;
+        newCy = oldW - cx;
+      }
+
+      const newEl = {
+        ...el,
+        x: newCx - el.width / 2,
+        y: newCy - el.height / 2,
+        orientation: ((el.orientation || 0) + angleDelta) % 360
+      };
+
+      if (el.type === 'line') {
+        const x1 = el.x1 ?? el.x;
+        const y1 = el.y1 ?? el.y;
+        const x2 = el.x2 ?? el.x + el.width;
+        const y2 = el.y2 ?? el.y;
+
+        if (direction === 'right') {
+          newEl.x1 = oldH - y1;
+          newEl.y1 = x1;
+          newEl.x2 = oldH - y2;
+          newEl.y2 = x2;
+        } else { // left
+          newEl.x1 = y1;
+          newEl.y1 = oldW - x1;
+          newEl.x2 = y2;
+          newEl.y2 = oldW - x2;
+        }
+
+        newEl.x = Math.min(newEl.x1, newEl.x2);
+        newEl.y = Math.min(newEl.y1, newEl.y2);
+        newEl.width = Math.abs(newEl.x2 - newEl.x1);
+        newEl.height = Math.abs(newEl.y2 - newEl.y1);
+        newEl.orientation = 0;
+      }
+
+      return newEl;
+    });
+
+    this._elements$.next(updated);
   }
 }

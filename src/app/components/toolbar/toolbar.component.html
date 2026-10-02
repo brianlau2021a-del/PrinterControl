@@ -22,11 +22,22 @@
 
   <div class="h-6 w-px bg-slate-700/50"></div>
 
-  <div class="flex items-center gap-2">
-    <label class="label-text">Rotate</label>
-    <select [value]="orientation" (change)="onOrientationChange(+$any($event.target).value)" class="select-field w-28">
-      <option *ngFor="let o of orientationOptions" [value]="o.value">{{ o.label }}</option>
-    </select>
+  <div class="flex items-center gap-1.5">
+    <button class="element-btn px-2" (click)="rotateLeft()" title="向左轉 90° (逆時針)">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- 逆時針箭頭 icon -->
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+      </svg>
+      <span class="text-xs">Left 90°</span>
+    </button>
+
+    <button class="element-btn px-2" (click)="rotateRight()" title="向右轉 90° (順時針)">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- 順時針箭頭 icon -->
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
+      </svg>
+      <span class="text-xs">Right 90°</span>
+    </button>
   </div>
 
   <div class="h-6 w-px bg-slate-700/50"></div>

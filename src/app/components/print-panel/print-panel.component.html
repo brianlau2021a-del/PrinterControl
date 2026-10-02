@@ -72,12 +72,7 @@
               <option *ngFor="let o of printDarknessOptions" [ngValue]="o.value">{{ o.label }}</option>
             </select>
           </div>
-          <div>
-            <label class="label-text text-[10px]">Rotate</label>
-            <select class="select-field text-xs mt-0.5" [(ngModel)]="settings.orientation" (ngModelChange)="saveSettingsToDesign()" [disabled]="!printerAvailable">
-              <option *ngFor="let o of orientationOptions" [ngValue]="o.value">{{ o.label }}</option>
-            </select>
-          </div>
+
 
         </div>
       </div>
